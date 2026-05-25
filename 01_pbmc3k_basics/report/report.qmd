@@ -1,0 +1,90 @@
+---
+title: "PBMC 3K — Reference scRNA-seq Pipeline"
+subtitle: "Portfolio Project 01 · single-cell analysis"
+author: "Marko Živanović, PhD"
+date: today
+format:
+  pdf:
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=22mm
+      - right=22mm
+    fontsize: 10pt
+    colorlinks: true
+    linkcolor: "blue"
+    toc: false
+    number-sections: false
+---
+
+## Background
+
+Peripheral blood mononuclear cells (PBMCs) are the most widely used reference system in single-cell RNA sequencing — well-characterized cell types, deeply benchmarked, and used as the canonical demonstration dataset across the scRNA-seq community. This project applies a complete Scanpy-based workflow to the 10X Genomics PBMC 3K dataset, demonstrating the standard analytical pipeline from raw counts to annotated cellular landscape, with publication-quality outputs at each step.
+
+## Dataset
+
+- **Source:** 10X Genomics public dataset — PBMC 3K (peripheral blood mononuclear cells from a healthy donor)
+- **Platform:** 10X Chromium v1
+- **Raw input:** 2,700 cells x 32,738 genes
+- **Distributed via:** Scanpy bundled datasets (`sc.datasets.pbmc3k()`)
+
+## Methods
+
+Analysis was performed in Python 3.11 using Scanpy 1.11. Workflow steps:
+
+1. **Quality control.** Per-cell metrics computed (`n_genes_by_counts`, `total_counts`, `pct_counts_mt`). Filters: 200 <= genes/cell < 2,500; mitochondrial fraction < 5%; genes expressed in >= 3 cells.
+2. **Normalization.** Total-count normalization to 10,000 UMIs per cell followed by log1p transformation.
+3. **Feature selection.** Top 2,000 highly variable genes selected using the Seurat-flavored dispersion approach.
+4. **Dimensionality reduction.** Genes scaled (clipped at +/-10), 50-component PCA computed; first 30 PCs used downstream based on the variance scree plot.
+5. **Neighborhood graph & embedding.** 15-nearest-neighbor graph in PC space; UMAP embedding with random state 42.
+6. **Clustering.** Leiden community detection (resolution 0.5, igraph flavor, 2 iterations) yielding 7 clusters.
+7. **Marker identification.** Wilcoxon rank-sum test per cluster (`sc.tl.rank_genes_groups`); top 200 markers retained per cluster.
+8. **Annotation.** Each Leiden cluster was assigned to a canonical PBMC cell type based on observed top-marker gene expression and verified against an independent mean-expression check across a curated marker panel (Zheng et al. 2017).
+
+## Results
+
+### Cellular landscape
+
+After QC, 2,638 high-quality cells were retained and organized into 7 transcriptionally distinct populations covering the canonical PBMC compartments.
+
+![**Figure 1.** UMAP embedding colored by annotated cell type. CD4 T cells form the largest population (1,174 cells), with adjacent CD8 T cells; B cells, CD14+ monocytes, FCGR3A+ monocytes, dendritic cells, and platelets occupy distinct regions of the embedding.](../figures/hero_umap_celltypes.png){width=85%}
+
+### Population composition
+
+| Cell type | Cells | % of total |
+|-----------|------:|-----------:|
+| CD4 T | 1,174 | 44.5% |
+| B | 496 | 18.8% |
+| CD8 T | 434 | 16.5% |
+| CD14 Monocytes | 342 | 13.0% |
+| NK (within CD8 T) | 142 | (5.4%) |
+| Dendritic cells | 36 | 1.4% |
+| FCGR3A Monocytes | 14 | 0.5% |
+| Platelets | small | <1% |
+
+Proportions are consistent with healthy peripheral blood — T cells dominate, followed by B cells and monocytes, with rare populations (DC, FCGR3A+ monocytes, platelets) recovered at expected low frequencies. NK cells were grouped with cytotoxic CD8 T cells at the chosen Leiden resolution; a higher resolution (0.8–1.0) would resolve them as a separate cluster.
+
+### Marker-based validation
+
+![**Figure 2.** Dotplot of canonical PBMC markers grouped by annotated cell type. The diagonal expression pattern confirms that each cluster maps cleanly onto its expected lineage markers — IL7R/CCR7 for CD4 T, CD8A/CD8B/NKG7 for CD8 T, CD79A/MS4A1 for B, CD14/LYZ for classical monocytes, FCGR3A/MS4A7 for non-classical monocytes, FCER1A/CST3 for DC, and PPBP for platelets.](../figures/07_marker_dotplot_byCellType.png){width=85%}
+
+Quantitative verification of the annotation was performed by computing mean expression of the canonical marker panel per cell type. Every assigned cell type was the top-scoring group for its panel marker(s) — confirming the annotation is biologically consistent rather than driven by clustering artifacts.
+
+## Interpretation
+
+This dataset is small (2,638 cells, healthy donor) and intentionally simple, but the workflow reproduced here is the same pipeline applied to substantially larger and more complex datasets — multi-patient tumor atlases, perturbation studies, developmental trajectories. Every step (QC, normalization, HVG selection, integration, clustering, annotation) scales directly to those settings; what changes is the depth of biological interpretation and the integration strategy needed when multiple samples or batches are involved.
+
+For this project, the noteworthy methodological points are: (1) the QC thresholds were calibrated to the observed distribution rather than copied from a tutorial, (2) PC selection was justified visually via the scree plot, and (3) cell-type assignment was independently verified by mean-expression scoring of canonical markers per assigned label — a check that catches mislabelings which dotplot inspection alone can miss.
+
+## Reproducibility
+
+- **Code:** `github.com/zivanovicmkg/scrnaseq-portfolio/tree/main/01_pbmc3k_basics`
+- **Environment:** conda env from `environment.yml` (Scanpy 1.11.5, Python 3.11)
+- **Random seed:** 42 throughout
+- **Run time:** approximately 2 minutes on a standard laptop
+
+## References
+
+1. Wolf FA, Angerer P, Theis FJ. *SCANPY: large-scale single-cell gene expression data analysis.* Genome Biology 19, 15 (2018).
+2. Zheng GXY, Terry JM, Belgrader P, et al. *Massively parallel digital transcriptional profiling of single cells.* Nature Communications 8, 14049 (2017).
+3. 10X Genomics. *3k PBMCs from a Healthy Donor — Single Cell Gene Expression Dataset by Cell Ranger 1.1.0.* support.10xgenomics.com
