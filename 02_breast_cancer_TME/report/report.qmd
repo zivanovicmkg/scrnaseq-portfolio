@@ -1,0 +1,100 @@
+---
+title: "Breast Cancer Tumor Microenvironment — Multi-Subtype scRNA-Seq Atlas"
+subtitle: "Portfolio Project 02 - integration, annotation, validation"
+author: "Marko Zivanovic, PhD"
+date: today
+format:
+  pdf:
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=22mm
+      - right=22mm
+    fontsize: 10pt
+    colorlinks: true
+    linkcolor: "blue"
+    toc: false
+    number-sections: false
+---
+
+## Background
+
+Breast cancer is biologically heterogeneous, with molecular subtypes (TNBC, HER2+, ER+) exhibiting distinct tumor microenvironments (TME). Understanding this heterogeneity at single-cell resolution is essential for biomarker discovery, immunotherapy stratification, and resistance mechanism research. This project reanalyzes the Wu et al. 2021 breast cancer single-cell atlas, integrating one representative patient per subtype to characterize and compare TME composition across the three major breast cancer subtypes.
+
+## Dataset
+
+- **Source:** Wu et al. 2021, *A single-cell and spatially resolved atlas of human breast cancers*
+- **Accession:** GEO **GSE176078**
+- **Reference:** Wu SZ, Al-Eryani G, Roden DL, et al. Nat Genet 53, 1334-1347 (2021). DOI: 10.1038/s41588-021-00911-1
+- **Patients selected:** CID4515 (TNBC), CID3921 (HER2+), CID4290A (ER+)
+- **Cells analyzed:** 12,962 (after QC, from initial 12,962 high-quality cells across three patients)
+- **Genes retained:** 23,062 (post filtering, expressed in at least 3 cells)
+- **Platform:** 10X Chromium
+
+## Methods
+
+Analysis was performed in Python 3.11 using Scanpy 1.11 and harmonypy. Workflow:
+
+1. **Data ingest.** Single sparse matrix (29,733 genes x 100,064 cells across 26 patients) plus metadata. Three target patients were selected based on subtype representation and balanced cell counts, then extracted as a 23,062 x 12,962 sub-matrix.
+2. **Quality control.** Per-cell metrics; filters: at least 200 genes, fewer than 8,000 genes per cell, mitochondrial fraction below 25 percent. Wu et al. data is pre-cleaned so few additional cells were removed.
+3. **Normalization.** Total-count normalization to 10,000 UMIs per cell, log1p transform.
+4. **Feature selection.** 3,000 highly variable genes selected with `batch_key='sample'` to control for per-patient gene variance.
+5. **Dimensionality reduction.** 50-component PCA on scaled HVGs.
+6. **Batch correction.** Harmony integration with `vars_use=['sample']`, converged in 9 iterations.
+7. **Embedding and clustering.** UMAP and Leiden clustering (resolution 0.6, igraph flavor) on the Harmony-corrected neighborhood graph, yielding 17 clusters.
+8. **Annotation.** Each cluster assigned to one of eight TME lineages (Epithelial, Endothelial, CAF, PVL, T cell, B cell, Plasmablast, Myeloid) by computing mean expression of canonical marker panels per cluster and assigning the top-scoring lineage automatically.
+9. **Validation.** Independent annotation compared against author-curated `celltype_major` labels distributed with the dataset.
+
+## Results
+
+### Integration removes batch effect
+
+![**Figure 1.** UMAP embeddings before (top) and after (bottom) Harmony integration, colored by sample (left) and subtype (right). Pre-integration, cells cluster predominantly by patient identity, with subtype-specific epithelial compartments fully separated. Post-integration, cells from different patients mix within shared cell-type compartments while preserving biological structure.](../figures/02_umap_integration_comparison.png){width=85%}
+
+### Cellular landscape of the integrated TME
+
+Harmony-integrated clustering recovered eight distinct TME lineages, organized in the expected topological pattern of breast cancer single-cell atlases.
+
+![**Figure 2.** UMAP embedding of the integrated three-patient atlas colored by automatically assigned lineage. Epithelial cells form the largest compartment (6,666 cells, dominated by cancer epithelium); T cells, Myeloid, and B cells occupy the immune branch; CAF, Endothelial, and PVL form the stromal branch; Plasmablasts appear as a small distinct island.](../figures/hero_umap_lineage.png){width=85%}
+
+### Annotation validated at 98.7 percent agreement
+
+The automatic marker-based annotation was compared against the author-curated cell type labels distributed with the dataset.
+
+![**Figure 3.** Confusion matrix of automatic lineage assignment vs Wu et al. ground-truth labels, normalized within each author lineage. Overall agreement: 98.7 percent (12,798 / 12,962 cells). Off-diagonal errors are biologically expected: Plasmablast / Myeloid boundary reflects the well-known ambiguity at the B-lineage to plasma-cell transition (4 percent of author-Myeloid recovered as our Plasmablast); a small fraction of PVL / CAF overlap (2 percent) reflects shared mesenchymal markers; and 1 percent of Epithelial cells map to CAF, consistent with epithelial-mesenchymal transition cells common in breast cancer.](../figures/05_annotation_agreement_heatmap.png){width=82%}
+
+### TME composition differs sharply across subtypes
+
+| Lineage | TNBC | HER2+ | ER+ |
+|---------|-----:|------:|-----:|
+| Epithelial | 52.6% | 14.9% | 69.6% |
+| T cell | 9.9% | 48.7% | 9.4% |
+| Myeloid | 12.7% | 12.4% | 6.1% |
+| B cell | 12.2% | 5.2% | 2.1% |
+| Endothelial | 2.9% | 6.9% | 5.4% |
+| CAF | 4.8% | 3.4% | 4.8% |
+| Plasmablast | 1.7% | 6.2% | 0.0% |
+| PVL | 3.2% | 2.3% | 2.7% |
+
+The HER2+ sample (CID3921) shows a strikingly T-cell-rich profile (48.7 percent), consistent with the immune-infiltrated phenotype frequently reported for HER2-enriched tumors. The TNBC sample (CID4515) exhibits the highest B cell fraction (12.2 percent) and Myeloid infiltrate (12.7 percent), supporting the immunologically active classification often associated with TNBC. The ER+ sample (CID4290A) is dominated by epithelium (69.6 percent) with minimal lymphocyte infiltration (9.4 percent T cell), consistent with the immune-cold profile typical of luminal breast cancers.
+
+These observations from a single patient per subtype are illustrative rather than population-level claims, but they reproduce qualitative patterns established by Wu et al. and the broader breast cancer immuno-oncology literature.
+
+## Interpretation
+
+This analysis demonstrates a complete reproducible workflow for multi-sample breast cancer scRNA-seq: ingest of raw sparse counts from GEO, per-sample QC, batch integration, automatic annotation, and quantitative validation against ground truth. The 98.7 percent agreement with author labels establishes that the annotation pipeline can be applied to new breast cancer datasets without expert manual curation when canonical marker panels are well-defined.
+
+The methodological choices most relevant for client work are: (1) Harmony integration was justified visually by the clear pre/post batch effect comparison rather than applied as default, (2) annotation was performed by an independent automated procedure and verified externally, and (3) compositional differences across subtypes were quantified at the lineage level, providing a starting point for deeper subtype-specific analysis (T cell sub-clustering, EMT score in epithelium, CAF heterogeneity) on request.
+
+## Reproducibility
+
+- **Code:** `github.com/zivanovicmkg/scrnaseq-portfolio/tree/main/02_breast_cancer_TME`
+- **Environment:** conda env from `environment.yml` (Scanpy 1.11.5, harmonypy, Python 3.11)
+- **Random seed:** 42 throughout
+- **Run time:** approximately 10-15 minutes on a 16-core machine after data download
+
+## References
+
+1. Wu SZ, Al-Eryani G, Roden DL, et al. *A single-cell and spatially resolved atlas of human breast cancers.* Nat Genet 53, 1334-1347 (2021).
+2. Korsunsky I, Millard N, Fan J, et al. *Fast, sensitive and accurate integration of single-cell data with Harmony.* Nat Methods 16, 1289-1296 (2019).
+3. Wolf FA, Angerer P, Theis FJ. *SCANPY: large-scale single-cell gene expression data analysis.* Genome Biology 19, 15 (2018).
