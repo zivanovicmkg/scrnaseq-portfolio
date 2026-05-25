@@ -1,0 +1,36 @@
+{
+  "dataset": "Bastidas-Ponce 2019 mouse embryonic pancreas E15.5 (scvelo bundled)",
+  "n_cells": 3696,
+  "n_genes": 7197,
+  "n_genes_fit_stochastic": 7197,
+  "n_genes_fit_dynamical": 2722,
+  "n_genes_fit_both": 2722,
+  "clusters": [
+    "Alpha",
+    "Beta",
+    "Delta",
+    "Ductal",
+    "Epsilon",
+    "Ngn3 high EP",
+    "Ngn3 low EP",
+    "Pre-endocrine"
+  ],
+  "velocity_confidence": {
+    "stochastic_mean": 0.7924629952929898,
+    "dynamical_mean": 0.8576306160346875
+  },
+  "mean_cosine_stoch_vs_dyn": 0.1580949547648911,
+  "median_cosine_stoch_vs_dyn": 0.13876277468911133,
+  "top10_driver_genes": [
+    "Pcsk2",
+    "Dcdc2a",
+    "Ank",
+    "Rps3",
+    "Gng12",
+    "Top2a",
+    "Pak3",
+    "Tmem163",
+    "Nfib",
+    "Pim2"
+  ]
+}

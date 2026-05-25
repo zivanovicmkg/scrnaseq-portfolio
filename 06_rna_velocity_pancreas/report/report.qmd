@@ -1,0 +1,214 @@
+---
+title: "RNA Velocity in Embryonic Mouse Pancreas: scVelo Stochastic vs Dynamical"
+subtitle: "Single-cell splicing kinetics on the Bastidas-Ponce 2019 endocrine atlas"
+author: "Marko Zivanovic, PhD"
+date: "2026-05-25"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=1in
+    fontsize: 10pt
+    colorlinks: true
+    fig-pos: H
+    pdf-engine: pdflatex
+execute:
+  echo: false
+  warning: false
+---
+
+# Summary
+
+We re-analyzed the canonical scVelo demonstration dataset, the Bastidas-Ponce et al.
+2019 mouse embryonic pancreas (E15.5, 3,696 cells across 8 annotated lineages),
+benchmarking the two main RNA velocity inference modes in scVelo: **stochastic**
+(first- and second-order moments, fast direction estimate) and **dynamical** (full
+per-gene splicing kinetics with global latent time). The stochastic model fits all
+7,197 expressed genes with mean per-cell confidence 0.79; the dynamical model
+fits a more conservative subset of 2,722 genes (38% of input) and yields cleaner
+geometry and higher confidence (0.86). Both modes recover the textbook developmental
+flow Ductal -> Ngn3-low EP -> Ngn3-high EP -> Pre-endocrine -> {Alpha, Beta, Delta, Epsilon},
+with the dynamical mode adding a coherent latent-time gradient and a per-gene driver
+ranking that highlights canonical endocrine maturation markers (Pcsk2, Pak3, Tmem163).
+
+# Dataset
+
+The data are bundled with scVelo and originate from Bastidas-Ponce et al.
+(*Development*, 2019). After standard scVelo preprocessing
+(`filter_and_normalize` with `min_shared_counts=20`, followed by moments computation
+on a 30-PC, 30-neighbor graph), the working object contains:
+
+- **3,696 cells** across 8 author-annotated lineages: Ductal, Ngn3 low EP, Ngn3 high EP,
+  Pre-endocrine, and the four mature endocrine fates (Alpha, Beta, Delta, Epsilon).
+- **7,197 genes** retained, each with both spliced and unspliced counts above the
+  shared-count threshold.
+
+# Methods
+
+**Stochastic velocity.** Per-gene gamma estimated by generalized least squares on
+first- and second-order spliced/unspliced moments. Implemented as `scv.tl.velocity(mode='stochastic')`.
+This mode fits every gene that passes preprocessing and produces no NaN velocities.
+
+**Dynamical velocity.** Per-gene transcription, splicing, and degradation rates
+recovered by likelihood maximization (`scv.tl.recover_dynamics`, n_jobs=8), followed
+by `scv.tl.velocity(mode='dynamical')`. Genes whose kinetics cannot be
+reliably fit are returned as NaN. A global latent time is then inferred via
+`scv.tl.latent_time`.
+
+**Cluster-level summary.** PAGA (`scv.tl.paga`) was applied to the velocity graph
+of the dynamical model, yielding a directed cluster-transition matrix and a
+graph plot overlaid on the UMAP.
+
+**Quantitative comparison.** For each cell we computed the cosine similarity between
+its stochastic and dynamical velocity vectors, restricted to the 2,722 genes finite
+in both models. Per-cluster summaries were then aggregated.
+
+# Results
+
+## Velocity streams (Figure 1)
+
+Both modes recover the canonical pancreatic endocrine flow on the UMAP: Ductal
+cells (top right) feed into Ngn3-low and then Ngn3-high endocrine progenitors,
+which converge into the Pre-endocrine population and fan out into Alpha, Beta,
+Delta, and Epsilon. Visually the directional fields are highly similar; the
+dynamical streamlines are smoother because per-gene kinetics regularize noisy
+genes out.
+
+![Side-by-side velocity streams. Left: stochastic mode; right: dynamical mode.
+Both recover the same lineage flow Ductal -> Ngn3 EP -> Pre-endocrine -> fate
+decisions. Streamlines are smoother in the dynamical
+mode.](../figures/hero_velocity_streams.png){#fig-hero width=100%}
+
+## Velocity length and confidence (Figure 2)
+
+Velocity *length* (vector magnitude) is highest in the Pre-endocrine to Beta
+transition - the region where splicing kinetics is strongest, consistent with the
+massive ramp-up of insulin and secretory-granule transcription as cells mature.
+Velocity *confidence* (per-cell coherence with neighbors) is high across the
+entire trajectory except in pockets of Ductal cells, where a mixture of
+cycling and quiescent stem cells flattens the local flow.
+
+![Per-cell velocity length and confidence (dynamical mode). Confidence drops
+in the Ductal compartment, consistent with mixed stem-cell
+states.](../figures/velocity_confidence.png){#fig-confidence width=100%}
+
+## PAGA velocity graph (Figure 3)
+
+The cluster-level transition graph shows two halves: a linear flow from
+Ductal through Ngn3 low EP to Pre-endocrine on the right, and a fan-out from
+Pre-endocrine into the four mature endocrine fates on the left. This is the
+expected developmental trajectory of the embryonic pancreatic endocrine system.
+
+![PAGA velocity graph (dynamical). Arrows show inferred directed transitions
+between annotated clusters.](../figures/paga_velocity.png){#fig-paga width=80%}
+
+## Latent time and driver genes (Figures 4-5)
+
+The dynamical model's latent time is a gene-shared estimate of how far each cell
+is along its trajectory. Coloring the UMAP by latent time recovers a clean
+gradient from Ductal (t = 0, dark) through the progenitor populations to mature
+endocrine cells (t = 1, bright) - a developmental ordering recovered purely
+from splicing kinetics, independent of any annotation.
+
+![Latent time inferred by the dynamical model. Gradient runs from Ductal (t=0)
+to mature endocrine fates (t=1).](../figures/latent_time_umap.png){#fig-latent width=70%}
+
+The top likelihood-ranked driver genes recapitulate the known biology of
+endocrine commitment. Early in latent time the heatmap is dominated by cell
+cycle and proliferation genes (Top2a, Mki67, Cdk1, Hmga2, Nusap1, Kif15); the
+mid-trajectory is enriched for Ngn3-low/pre-endocrine markers (Smoc1, Dcdc2a,
+Bicc1, Shank2, Nfib); the late phase is dominated by canonical endocrine
+maturation markers (Pcsk2 - prohormone convertase; Abcc8 - sulfonylurea
+receptor / K-ATP channel subunit; Pak3, Tmem163, Cpe, Gnao1, Tspan7).
+
+![Top 30 driver genes by dynamical-model fit likelihood, ordered along latent
+time. Early cell-cycle / ductal markers transition through Ngn3-low programs to
+mature endocrine genes.](../figures/driver_genes_heatmap.png){#fig-drivers width=85%}
+
+## Quantitative comparison
+
+| Metric                          | Stochastic | Dynamical |
+|---------------------------------|------------|-----------|
+| Genes fit (non-NaN velocity)    | 7,197 (100%) | 2,722 (37.8%) |
+| Mean per-cell confidence        | 0.792      | **0.858** |
+| Median per-cell confidence      | 0.812      | 0.864     |
+
+The dynamical model is more conservative - it discards 62% of input genes whose
+kinetics it cannot reliably fit - but the retained subset produces a higher-confidence
+velocity field. Per-cell cosine similarity between the two velocity vectors,
+computed over the 2,722 commonly fit genes, has a global mean of 0.158
+(median 0.139). The agreement is non-trivial but modest, with substantial
+cluster-level structure:
+
+| Cluster        | Mean cosine | n cells |
+|----------------|-------------|---------|
+| Beta           | **0.283**   | 591     |
+| Pre-endocrine  | 0.163       | 592     |
+| Ngn3 high EP   | 0.146       | 642     |
+| Ductal         | 0.124       | 916     |
+| Ngn3 low EP    | 0.122       | 262     |
+| Alpha          | 0.119       | 481     |
+| Delta          | 0.118       | 70      |
+| Epsilon        | 0.112       | 142     |
+
+Beta cells show the strongest agreement between the two modes, roughly twice
+the population mean. This is consistent with their mature, highly active
+secretory-granule transcription program: both models converge when splicing
+dynamics is strong and unambiguous. In stem-like or transitional populations
+(Ductal, Ngn3 low EP), the moment-based stochastic model picks up signal from
+genes that the dynamical model rejects as unfit, producing divergent per-cell
+vectors despite identical global flow.
+
+# Discussion
+
+**Mode selection.** The two modes are complementary. Use **stochastic** when a
+fast, robust direction estimate over the entire transcriptome is sufficient -
+typical for exploratory analysis and large atlases. Use **dynamical** when
+downstream tasks require per-gene kinetics, latent time, or driver-gene ranking;
+this is the gold standard for figure-quality velocity in publications.
+
+**Biological recovery.** The latent time gradient and the top driver gene set
+agree with the published account of embryonic endocrine commitment:
+proliferation-driven ductal expansion, Ngn3-mediated lineage specification, and
+maturation programs centered on Pcsk2 / Abcc8 / Pak3. No additional manual
+annotation was required to recover this picture - the splicing signal alone
+ordered the data correctly.
+
+**Cluster-level agreement.** The Beta-specific increase in stochastic-vs-dynamical
+cosine agreement is a useful diagnostic: regions with mature, coherent
+transcriptional programs are robustly fit by both algorithms, while transitional
+or stem-like populations are inherently more ambiguous. A consultant deploying
+velocity in a new system should expect similar variance across maturity gradients.
+
+# Limitations
+
+- The dataset has a published author annotation; the analysis here re-validates
+  the annotation using independent splicing-based ordering. For a fully blind
+  experiment on a novel system, manual interpretation of latent-time endpoints
+  and driver genes would still be required.
+- The dynamical model's NaN rate (62%) is a known characteristic of the
+  likelihood fit; alternative approaches (CellRank2, DeepVelo) reduce this at
+  the cost of additional model complexity.
+- All inference here is CPU-only; on this dataset (3,696 cells) runtimes are
+  minutes, but scaling to >100k cells would benefit from a GPU.
+
+# Reproducibility
+
+- Source: <https://github.com/zivanovicmkg/scrnaseq-portfolio>
+- Project subdirectory: `06_rna_velocity_pancreas/`
+- Environment: scanpy 1.11.5, scvelo 0.3.4, anndata 0.12 (NumPy 1.26 required for
+  scVelo 0.3.4 compatibility).
+- Total runtime on a 16-core / 62 GB workstation: ~12 minutes.
+
+# References
+
+- Bastidas-Ponce A, et al. *Comprehensive single cell mRNA profiling reveals a
+  detailed roadmap for pancreatic endocrinogenesis.* Development 146, dev173849
+  (2019).
+- Bergen V, Lange M, Peidli S, Wolf FA, Theis FJ. *Generalizing RNA velocity to
+  transient cell states through dynamical modeling.* Nat Biotechnol 38,
+  1408-1414 (2020).
+- La Manno G, et al. *RNA velocity of single cells.* Nature 560, 494-498 (2018).
+- Wolf FA, et al. *PAGA: graph abstraction reconciles clustering with trajectory
+  inference through a topology preserving map of single cells.* Genome Biol 20,
+  59 (2019).
