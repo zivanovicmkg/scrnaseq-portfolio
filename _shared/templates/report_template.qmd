@@ -1,0 +1,68 @@
+---
+title: "{{Project Title}}"
+subtitle: "scRNA-seq portfolio — Marko Živanović"
+author: "Marko Živanović, PhD"
+date: today
+format:
+  pdf:
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=22mm
+      - right=22mm
+    fontsize: 10pt
+    mainfont: "Helvetica"
+    colorlinks: true
+    linkcolor: "blue"
+    toc: false
+    number-sections: false
+---
+
+## Background
+
+Briefly describe the biological context: cell system, disease, why this dataset matters, and what question the analysis addresses. **2–4 sentences.**
+
+## Dataset
+
+- **Source:** {{GEO accession / Zenodo / 10X}}
+- **Reference:** {{Author et al., Journal Year, DOI}}
+- **Samples:** {{N cells, N samples, conditions}}
+- **Platform:** {{10X Chromium v3 / Smart-seq2 / etc.}}
+
+## Methods
+
+Compact methods paragraph — pipeline tool versions, QC thresholds, normalization, integration (if any), clustering resolution, annotation strategy. Reproducible to the level a reviewer could re-run.
+
+## Results
+
+### Cellular landscape
+
+![Hero UMAP showing cluster organization](../figures/hero_umap.png){width=80%}
+
+One paragraph interpreting the cellular landscape.
+
+### Marker genes & annotation
+
+![Top markers per cluster](../figures/marker_heatmap.png){width=85%}
+
+One paragraph on how clusters map to known cell types.
+
+### {{Additional analysis section}}
+
+Velocity / trajectory / DE / communication — whichever is the headline of this project.
+
+## Biological interpretation
+
+Short closing paragraph that ties the analysis back to biology — what the results mean, what would be the natural follow-up experiment, and any caveats. **This is what separates a portfolio piece from a tutorial.**
+
+## Reproducibility
+
+- **Code:** github.com/USERNAME/scrnaseq-portfolio/tree/main/NN_project_name
+- **Environment:** conda env from `environment.yml`
+- **Random seed:** 42
+- **Run time:** {{X minutes on a Y-core machine, Z GB RAM}}
+
+## References
+
+1. ...
+2. ...

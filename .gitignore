@@ -1,0 +1,54 @@
+# Data (too large for git)
+*/data/*
+!*/data/.gitkeep
+!*/data/README.md
+
+# Computed objects
+*.h5ad
+*.h5
+*.rds
+*.RData
+*.loom
+*.mtx
+*.mtx.gz
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rcheck/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Build artifacts (keep final figures, exclude intermediate)
+*/figures/_intermediate/
+*/figures/_drafts/
+
+# Reports (keep final PDFs, drop LaTeX intermediates)
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz

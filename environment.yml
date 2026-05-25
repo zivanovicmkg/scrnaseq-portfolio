@@ -1,0 +1,78 @@
+name: scportfolio
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # Core Python
+  - python=3.11
+  - pip
+  - jupyterlab
+  - notebook
+  - ipywidgets
+
+  # Single-cell Python stack
+  - scanpy>=1.10
+  - anndata>=0.10
+  - scvelo>=0.3
+  - leidenalg
+  - python-igraph
+  - harmonypy
+  - scanorama
+  - bbknn
+  - scrublet
+
+  # Numerics & plotting
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - plotly
+  - statsmodels
+  - umap-learn
+
+  # I/O
+  - h5py
+  - openpyxl
+  - pyarrow
+
+  # R + Seurat stack
+  - r-base=4.3
+  - r-essentials
+  - r-seurat>=5.0
+  - r-tidyverse
+  - r-ggplot2
+  - r-patchwork
+  - r-cowplot
+  - r-rmarkdown
+  - r-knitr
+  - r-irkernel
+  - bioconductor-singlecellexperiment
+  - bioconductor-scran
+  - bioconductor-scater
+  - bioconductor-limma
+  - bioconductor-edger
+  - bioconductor-deseq2
+  - bioconductor-complexheatmap
+
+  # Report generation
+  - quarto
+  - pandoc
+
+  # Utilities
+  - git
+  - wget
+  - curl
+  - tqdm
+
+  # pip-only packages
+  - pip:
+      - cellrank
+      - palantir
+      - decoupler
+      - omnipath
+      - gseapy
+      - cellphonedb
+      - mygene

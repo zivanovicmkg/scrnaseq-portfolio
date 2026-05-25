@@ -1,0 +1,56 @@
+# Portfolio-wide matplotlib style — publication-ready
+# Usage in any notebook:
+#   import matplotlib.pyplot as plt
+#   plt.style.use('_shared/styles/portfolio.mplstyle')
+
+# Figure
+figure.figsize      : 6.0, 4.5
+figure.dpi          : 120
+savefig.dpi         : 300
+savefig.bbox        : tight
+savefig.pad_inches  : 0.1
+savefig.transparent : False
+savefig.facecolor   : white
+
+# Fonts
+font.family         : sans-serif
+font.sans-serif     : Arial, Helvetica, DejaVu Sans, sans-serif
+font.size           : 10
+axes.titlesize      : 11
+axes.labelsize      : 10
+xtick.labelsize     : 9
+ytick.labelsize     : 9
+legend.fontsize     : 9
+figure.titlesize    : 12
+
+# Axes
+axes.linewidth      : 0.8
+axes.edgecolor      : 333333
+axes.labelcolor     : 333333
+axes.spines.top     : False
+axes.spines.right   : False
+axes.grid           : False
+axes.axisbelow      : True
+
+# Ticks
+xtick.color         : 333333
+ytick.color         : 333333
+xtick.direction     : out
+ytick.direction     : out
+xtick.major.size    : 3.5
+ytick.major.size    : 3.5
+xtick.minor.size    : 2.0
+ytick.minor.size    : 2.0
+xtick.major.width   : 0.8
+ytick.major.width   : 0.8
+
+# Lines
+lines.linewidth     : 1.5
+lines.markersize    : 4
+
+# Legend
+legend.frameon      : False
+legend.borderaxespad: 0.5
+
+# Color cycle — colorblind-friendly (Wong palette)
+axes.prop_cycle     : cycler('color', ['0173B2','DE8F05','029E73','D55E00','CC78BC','CA9161','FBAFE4','949494','ECE133','56B4E9'])
