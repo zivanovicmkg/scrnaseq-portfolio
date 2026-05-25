@@ -1,0 +1,40 @@
+{
+  "dataset": "Wu 2021 breast cancer, 3 patients, 12,962 cells",
+  "batch_key": "orig.ident",
+  "label_key": "celltype_major",
+  "n_batches": 3,
+  "n_labels": 9,
+  "n_hvg": 2000,
+  "methods": [
+    "Unintegrated",
+    "Harmony",
+    "BBKNN",
+    "Scanorama"
+  ],
+  "runtimes_sec": {
+    "Unintegrated": 0.497769832611084,
+    "Harmony": 3.1604952812194824,
+    "BBKNN": 1.0829112529754639,
+    "Scanorama": 6.916430711746216
+  },
+  "benchmark_time_sec": 80.77127122879028,
+  "bbknn_handling": "BBKNN embedding for scib-metrics is the diffusion map computed from the bbknn-modified kNN graph.",
+  "aggregate_total": {
+    "Unintegrated": 0.576478846696356,
+    "Harmony": 0.6557998828190185,
+    "BBKNN": 0.6033803860276853,
+    "Scanorama": 0.5985590222937638
+  },
+  "aggregate_batch_correction": {
+    "Unintegrated": 0.38187547481889295,
+    "Harmony": 0.5788079212351682,
+    "BBKNN": 0.4872267762645869,
+    "Scanorama": 0.4781644948976176
+  },
+  "aggregate_bio_conservation": {
+    "Unintegrated": 0.706214427947998,
+    "Harmony": 0.707127857208252,
+    "BBKNN": 0.6808161258697509,
+    "Scanorama": 0.6788220405578613
+  }
+}
