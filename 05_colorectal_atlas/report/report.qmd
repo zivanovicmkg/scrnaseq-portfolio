@@ -1,0 +1,194 @@
+---
+title: "Colorectal Cancer Atlas Re-Analysis: Harmony vs scVI Integration Benchmark"
+subtitle: "Single-cell RNA-seq of MMRd and MMRp colorectal tumors (Pelka et al., 2021)"
+author: "Marko Zivanovic, PhD"
+date: "2026-05-25"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=1in
+    fontsize: 10pt
+    colorlinks: true
+    fig-pos: H
+    pdf-engine: pdflatex
+execute:
+  echo: false
+  warning: false
+---
+
+# Summary
+
+We re-analyzed the publicly available colorectal cancer (CRC) single-cell atlas from
+Pelka et al. (Cell, 2021) to benchmark two widely used batch-integration strategies
+on a balanced cohort of mismatch-repair-deficient (MMRd) and mismatch-repair-proficient
+(MMRp) tumors. Eight donors (4 MMRd + 4 MMRp), tumor samples only, were selected from
+the CELLxGENE-curated atlas, yielding 56,022 cells after QC. We applied **Harmony**
+(linear PCA-based correction) and **scVI** (deep generative model on raw counts) using
+donor as the batch covariate, and quantified both batch removal and biological signal
+preservation. The two methods occupy distinct points on the integration trade-off curve:
+Harmony delivered the strongest batch mixing (donor mixing entropy 1.82 vs 1.04 baseline,
++75%), while scVI gave the cleanest lineage structure (silhouette 0.293 vs 0.198 baseline,
++48%). Compositional analysis recovered the canonical MMRd immune signature: elevated
+T/NK/ILC infiltration in MMRd tumors versus plasma-cell dominance in MMRp tumors,
+consistent with the immunotherapy-responsive phenotype of microsatellite-unstable CRC.
+
+# Dataset and cohort selection
+
+The source data is the CELLxGENE-hosted release of the Pelka 2021 CRC atlas
+(collection ID `4d82bd8e-8827-410b-8fc7-685b7dd92585`,
+DOI 10.1016/j.cell.2021.08.003). The full atlas contains 370,115 cells across 62
+donors and 7 lineage categories. We restricted analysis to tumor-derived cells
+(`disease = colon adenocarcinoma`) and selected the top four donors by cell count
+within each MMR status group, balancing the comparison and keeping runtime tractable
+on a workstation-class CPU.
+
+**Selected donors:**
+
+- MMRd (MSI-like): C123, C130, C139, C170
+- MMRp (MSS-like): C124, C129, C162, C171
+
+After per-cell QC (n_genes >= 500, pct_mt <= 25) and gene filtering (min_cells >= 10),
+the working object contained **56,022 cells x 23,415 genes**. Donor-aware highly
+variable gene selection (Scanpy `seurat_v3` flavor on raw counts) retained 3,000
+genes for downstream embedding.
+
+# Methods
+
+**Normalization.** Counts were normalized per cell to 10,000 and log1p-transformed.
+The raw count matrix was retained in a separate layer for scVI training.
+
+**Baseline embedding.** PCA on scaled HVG expression (50 components) followed by
+nearest-neighbor graph (k = 15, 30 PCs) and UMAP.
+
+**Harmony.** harmonypy v0.0.10+ called directly on the baseline PCA. Default theta
+and lambda; 20 maximum iterations; convergence reached at iteration 5.
+
+**scVI.** Variational autoencoder trained on raw counts with `donor_id` as the batch
+covariate. Architecture: 10-dimensional latent space, 2 hidden layers, 128 units per
+layer, negative binomial likelihood. Training: up to 50 epochs, batch size 512,
+learning rate 1e-3, early stopping with patience 8, CPU backend.
+
+**Clustering.** Leiden (igraph backend, resolution 0.6) on the integrated neighbor
+graph for each method.
+
+**Integration metrics.** Two complementary scores were computed on 5,000 randomly
+sampled cells (seed fixed):
+
+- *Donor mixing entropy*: Shannon entropy (base 2) of donor labels among the k = 50
+  nearest neighbors of each cell in the integrated embedding. Higher = donors are
+  more uniformly mixed locally = stronger batch correction.
+- *Lineage silhouette*: silhouette coefficient against the author-provided lineage
+  labels (`ClusterTop`). Higher = lineage clusters are more compact and well-separated
+  = biological signal preserved.
+
+# Results
+
+## Integration quality (Figure 1, 2)
+
+| Method      | Donor mixing entropy | Lineage silhouette |
+|-------------|----------------------|--------------------|
+| Uncorrected | 1.044 +/- 0.959      | 0.198              |
+| Harmony     | **1.821** +/- 0.814  | 0.255              |
+| scVI        | 1.671 +/- 0.774      | **0.293**          |
+
+Harmony achieved the strongest donor mixing (+75% over the uncorrected baseline) and
+moderate lineage preservation (+29%). scVI traded a small amount of batch mixing
+(-8% relative to Harmony) for the cleanest lineage geometry (+48% over baseline,
++15% over Harmony). The trade-off is consistent with the published benchmarks of
+Luecken et al. (Nat Methods, 2022): linear methods tend to over-mix while preserving
+less fine-grained biology, while deep generative models give more compact lineage
+clusters at the cost of slightly weaker batch removal.
+
+![Harmony vs scVI integration. Top: Harmony embedding colored by donor (left) and
+by author-provided lineage labels (right). Bottom: scVI embedding, same colorings.
+Both methods recover the 7 major lineages; differences are visible in donor mixing
+fidelity and lineage compactness.](../figures/hero_harmony_vs_scvi.png){#fig-hero width=100%}
+
+![Integration trade-off: mixing entropy vs lineage silhouette. The uncorrected
+baseline sits in the low-low corner; Harmony moves furthest along the x-axis,
+scVI furthest along the y-axis.](../figures/integration_tradeoff.png){#fig-tradeoff width=70%}
+
+## Lineage composition: MMRd vs MMRp (Figure 3)
+
+Aggregating across all eight donors, the lineage composition recapitulates the
+canonical immunological signature of microsatellite-instable CRC:
+
+- **T/NK/ILC fraction is roughly twice as high in MMRd tumors** (~0.32 vs ~0.16).
+  This is consistent with the elevated neoantigen burden of MMRd tumors driving
+  cytotoxic lymphocyte infiltration, and is the mechanistic basis for the
+  FDA-approved use of immune checkpoint blockade in MSI-high CRC.
+- **Plasma-cell content is markedly higher in MMRp tumors** (~0.26 vs ~0.03).
+- Epithelial and myeloid fractions are similar between the two groups.
+
+![Per-MMR-status lineage composition. MMRd tumors are dominated by T/NK/ILC and
+epithelial compartments; MMRp tumors carry a substantial plasma-cell
+fraction.](../figures/mmr_lineage_composition.png){#fig-mmr width=85%}
+
+## Donor-level heterogeneity (Figure 4)
+
+The per-donor heatmap exposes a known caveat: aggregate compositions hide within-group
+variance. Donor C171 (MMRp) is an outlier with > 0.45 plasma-cell fraction, single-handedly
+driving most of the MMRp plasma signal. Donor C170 (MMRd) skews myeloid-rich, and C123
+is the most T/NK-dominated MMRd case. Any downstream claim about MMR-associated cell-state
+shifts at the patient level should be conditioned on this heterogeneity; an N = 4
+comparison is not a statistical assertion of differential abundance.
+
+![Per-donor lineage fractions. Red row annotation = MMRd, blue = MMRp. Note the
+plasma-rich C171 outlier and within-group spread.](../figures/mmr_donor_heatmap.png){#fig-heatmap width=85%}
+
+# Discussion
+
+This re-analysis serves three purposes:
+
+1. **Reproducibility.** The lineage structure described by the original authors is
+   recovered with off-the-shelf Scanpy pipelines and 3,000 HVGs, without manual
+   curation. The `ClusterTop` author labels achieve a lineage silhouette of 0.29
+   in scVI latent space, indicating that the modern integration toolchain agrees
+   with the manual annotation.
+2. **Method-choice guidance.** For a downstream task that requires aggressive
+   removal of donor-level effects (e.g., joint clustering across many patients
+   to find shared cell states), Harmony is the practical default. For tasks
+   requiring well-separated cluster geometry (e.g., reference building, label
+   transfer, or scArches-style projection), scVI's latent space is the better
+   substrate. The numerical gap between them is small in absolute terms but
+   consistent in direction.
+3. **Biological signal.** The MMRd-elevated T/NK/ILC fraction is internally
+   consistent with the known immunology of microsatellite-unstable colorectal
+   cancer and provides a sanity check that the integration has not erased
+   biological covariates correlated with batch.
+
+# Limitations
+
+- N = 4 per MMR group is too small to support statistical claims about MMR-associated
+  cell-type frequencies; the descriptive comparison should be read as a sanity check,
+  not a discovery.
+- The mixing-entropy and silhouette metrics are sampled (5,000 cells each); they
+  are sufficient for ranking but not for fine-grained calibration. Full benchmarks
+  (kBET, LISI, ASW per lineage) would refine the picture.
+- scVI training was capped at 50 epochs on CPU. Longer training, particularly with
+  a GPU, could marginally improve the integration metrics.
+
+# Reproducibility
+
+All code, conda environment specification, and Docker recipe live in the project
+repository. The CELLxGENE dataset is downloaded directly from the public mirror;
+no manual data acquisition is required.
+
+- Source: <https://github.com/zivanovicmkg/scrnaseq-portfolio>
+- Project subdirectory: `05_colorectal_atlas/`
+- Environment: scanpy 1.11.5, harmonypy >= 0.0.10, scVI 1.4.2, PyTorch 2.7.1 (CPU)
+- Total runtime on a 16-core / 62 GB workstation: ~45 minutes.
+
+# References
+
+- Pelka K, et al. *Spatially organized multicellular immune hubs in human colorectal
+  cancer.* Cell 184, 4734-4752 (2021). DOI: 10.1016/j.cell.2021.08.003
+- Korsunsky I, et al. *Fast, sensitive and accurate integration of single-cell data
+  with Harmony.* Nat Methods 16, 1289-1296 (2019).
+- Lopez R, et al. *Deep generative modeling for single-cell transcriptomics.*
+  Nat Methods 15, 1053-1058 (2018).
+- Luecken MD, et al. *Benchmarking atlas-level data integration in single-cell
+  genomics.* Nat Methods 19, 41-50 (2022).
+- Wolf FA, Angerer P, Theis FJ. *SCANPY: large-scale single-cell gene expression
+  data analysis.* Genome Biol 19, 15 (2018).

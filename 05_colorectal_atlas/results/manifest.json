@@ -1,0 +1,37 @@
+{
+  "dataset": "Pelka 2021 (CELLxGENE collection 4d82bd8e-8827-410b-8fc7-685b7dd92585)",
+  "donors_selected_MMRd": [
+    "C123",
+    "C130",
+    "C139",
+    "C170"
+  ],
+  "donors_selected_MMRp": [
+    "C124",
+    "C129",
+    "C162",
+    "C171"
+  ],
+  "n_cells_after_qc": 56022,
+  "n_genes": 23415,
+  "n_hvgs": 3000,
+  "harmony_clusters": 21,
+  "scvi_clusters": 23,
+  "integration_metrics": {
+    "uncorrected": {
+      "mixing_entropy": 1.0441362658856743,
+      "mixing_sd": 0.9591169876515194,
+      "lineage_silhouette": 0.1978770494461059
+    },
+    "harmony": {
+      "mixing_entropy": 1.8213729248175063,
+      "mixing_sd": 0.8139045102027167,
+      "lineage_silhouette": 0.2545165419578552
+    },
+    "scvi": {
+      "mixing_entropy": 1.6705622689078228,
+      "mixing_sd": 0.7735117994714306,
+      "lineage_silhouette": 0.2930954694747925
+    }
+  }
+}
