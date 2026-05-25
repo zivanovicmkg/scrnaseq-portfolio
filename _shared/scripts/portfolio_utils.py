@@ -34,8 +34,10 @@ def save_figure(fig, name: str, out_dir: str | Path = "../figures",
     out_dir.mkdir(parents=True, exist_ok=True)
     for fmt in formats:
         path = out_dir / f"{name}.{fmt}"
-        fig.savefig(path, dpi=dpi, bbox_inches="tight",
-                    pil_kwargs={"compression": "tiff_lzw"} if fmt == "tiff" else None)
+        save_kwargs = {"dpi": dpi, "bbox_inches": "tight"}
+        if fmt == "tiff":
+            save_kwargs["pil_kwargs"] = {"compression": "tiff_lzw"}
+        fig.savefig(path, **save_kwargs)
         print(f"  saved {path}")
 
 
