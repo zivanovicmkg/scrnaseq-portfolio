@@ -1,0 +1,74 @@
+{
+  "dataset": "Setty 2019 human CD34+ bone marrow, replicate 1",
+  "n_cells": 5780,
+  "n_genes": 14651,
+  "n_hvg": 1500,
+  "n_pcs_85pct": 10,
+  "n_multiscale_components": 7,
+  "start_cell": "Run5_164698952452459",
+  "start_cluster": "0",
+  "used_canonical_start": true,
+  "n_terminal_states": 4,
+  "terminal_states": [
+    "Ery",
+    "Lymph",
+    "DC",
+    "Mono"
+  ],
+  "pseudotime_range": [
+    0.0,
+    1.0
+  ],
+  "entropy_range": [
+    0.029438871891529664,
+    1.3701357022187897
+  ],
+  "spearman_pt_vs_entropy": -0.9565503096208512,
+  "spearman_pt_vs_entropy_pval": 0.0,
+  "validation_vs_published": {
+    "pseudotime_vs_published": {
+      "spearman_rho": 0.9576825514792164,
+      "p": 0.0,
+      "n": 5780
+    },
+    "entropy_vs_diff_potential": {
+      "spearman_rho": 0.9426179807637757,
+      "p": 0.0,
+      "n": 5780
+    },
+    "branch_probabilities_vs_published": {
+      "Ery": {
+        "spearman_rho": 0.9649140481122029,
+        "p": 0.0,
+        "mapped_to_published": "Ery"
+      },
+      "Lymph": {
+        "spearman_rho": 0.6932658816680651,
+        "p": 0.0,
+        "mapped_to_published": "CLP"
+      },
+      "DC": {
+        "spearman_rho": 0.9496339801372619,
+        "p": 0.0,
+        "mapped_to_published": [
+          "pDC",
+          "cDC"
+        ]
+      },
+      "Mono": {
+        "spearman_rho": 0.9673821519584767,
+        "p": 0.0,
+        "mapped_to_published": "Mono"
+      }
+    },
+    "published_terminal_states": [
+      "Mono",
+      "Ery",
+      "pDC",
+      "Mega",
+      "CLP",
+      "cDC"
+    ],
+    "mapping_note": "Our \"DC\" maps to published \"pDC + cDC\" (sum). Our \"Lymph\" maps to published \"CLP\". Mega and Mk are not modeled in our 4-branch analysis."
+  }
+}
