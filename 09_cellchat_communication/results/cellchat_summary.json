@@ -1,0 +1,34 @@
+{
+  "dataset": "Wu 2021 breast cancer, 3 patients, 12,962 cells",
+  "subtypes": ["ER+", "HER2+", "TNBC"],
+  "cellchat_version": "2.2.0.9001",
+  "per_subtype": {
+    "ER+": {
+      "n_cells": 5789,
+      "n_celltypes": 9,
+      "n_significant_LR_pairs": 1938,
+      "n_signaling_pathways": 102,
+      "total_n_interactions": 2265,
+      "total_interaction_strength": 41.0688,
+      "top_pathways": ["COLLAGEN", "MIF", "FN1", "APP", "LAMININ", "CD99", "MK", "CypA", "THBS", "MHC-II"]
+    },
+    "HER2+": {
+      "n_cells": 3024,
+      "n_celltypes": 9,
+      "n_significant_LR_pairs": 2105,
+      "n_signaling_pathways": 132,
+      "total_n_interactions": 3766,
+      "total_interaction_strength": 51.7619,
+      "top_pathways": ["COLLAGEN", "MIF", "FN1", "APP", "CypA", "LAMININ", "CD99", "MHC-II", "MK", "MHC-I"]
+    },
+    "TNBC": {
+      "n_cells": 4149,
+      "n_celltypes": 9,
+      "n_significant_LR_pairs": 1942,
+      "n_signaling_pathways": 131,
+      "total_n_interactions": 5032,
+      "total_interaction_strength": 47.0522,
+      "top_pathways": ["COLLAGEN", "LAMININ", "FN1", "APP", "MK", "THBS", "SPP1", "CypA", "ANGPTL", "MHC-II"]
+    }
+  }
+}
