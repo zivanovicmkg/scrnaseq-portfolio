@@ -1,0 +1,38 @@
+{
+  "ecosystem": "Seurat (R)",
+  "seurat_version": "5.3.0",
+  "n_cells_after_qc": 2643,
+  "n_genes_after_qc": 13714,
+  "n_hvg": 2000,
+  "n_pcs": 50,
+  "n_seurat_clusters": 8,
+  "cluster_sizes": {
+    "0": 1167,
+    "1": 478,
+    "2": 347,
+    "3": 282,
+    "4": 162,
+    "5": 162,
+    "6": 31,
+    "7": 14
+  },
+  "cluster_to_celltype": {
+    "0": "CD4 T",
+    "1": "Mono CD14",
+    "2": "B",
+    "3": "CD8 T",
+    "4": "Mono FCGR3A",
+    "5": "NK",
+    "6": "DC",
+    "7": "Platelet"
+  },
+  "celltypes": ["B", "CD4 T", "CD8 T", "DC", "Mono CD14", "Mono FCGR3A", "NK", "Platelet"],
+  "runtime_sec": {
+    "qc": 0.1185,
+    "preprocessing": 2.0323,
+    "umap_clustering": 3.4954,
+    "marker_genes": 1.5161,
+    "total": 7.1623
+  },
+  "seed": 42
+}

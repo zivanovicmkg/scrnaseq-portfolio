@@ -1,0 +1,47 @@
+{
+  "ecosystem": "Scanpy (Python)",
+  "scanpy_version": "1.11.5",
+  "n_cells_after_qc": 2643,
+  "n_genes_after_qc": 13714,
+  "n_hvg": 2000,
+  "n_pcs": 50,
+  "n_leiden_clusters": 8,
+  "cluster_sizes": {
+    "0": 338,
+    "1": 354,
+    "2": 644,
+    "3": 476,
+    "4": 177,
+    "5": 150,
+    "6": 472,
+    "7": 32
+  },
+  "cluster_to_celltype": {
+    "0": "CD8 T",
+    "1": "B",
+    "2": "CD4 T",
+    "3": "Mono CD14",
+    "4": "Mono FCGR3A",
+    "5": "NK",
+    "6": "Unknown_6",
+    "7": "DC"
+  },
+  "celltypes": [
+    "B",
+    "CD4 T",
+    "CD8 T",
+    "DC",
+    "Mono CD14",
+    "Mono FCGR3A",
+    "NK",
+    "Unknown_6"
+  ],
+  "runtime_sec": {
+    "qc": 0.19399666786193848,
+    "preprocessing": 1.0836527347564697,
+    "umap_clustering": 6.000509977340698,
+    "marker_genes": 0.301069974899292,
+    "total": 7.579229354858398
+  },
+  "seed": 42
+}
