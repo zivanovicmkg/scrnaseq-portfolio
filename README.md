@@ -2,7 +2,7 @@
 
 End-to-end single-cell RNA-seq analyses on public datasets, prepared as a portfolio of reproducible workflows across cancer biology, immunology, development, and methodological showcases. Every project ships with: figures, a Jupyter or R notebook, and a short PDF report.
 
-**Tools:** Scanpy (Python), Seurat (R), scVelo, Palantir, Harmony, CellChat / CellPhoneDB
+**Tools:** Scanpy (Python), Seurat (R), scVelo, Palantir, Harmony, BBKNN, Scanorama, scVI, CellChat, scib-metrics
 **Reproducibility:** conda environments, pinned versions, public data only
 **Author:** Marko Živanović — PhD, Principal Research Fellow, BioIRC / University of Kragujevac
 
