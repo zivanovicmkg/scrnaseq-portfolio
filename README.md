@@ -12,16 +12,16 @@ End-to-end single-cell RNA-seq analyses on public datasets, prepared as a portfo
 
 | #  | Title | Tool | Dataset | Status |
 |----|-------|------|---------|--------|
-| 01 | PBMC 3K — Reference scRNA-seq Pipeline | Scanpy | 10X PBMC 3K | ☐ |
-| 02 | Breast Cancer Tumor Microenvironment | Scanpy | Wu et al. 2021, GSE176078 | ☐ |
-| 03 | Glioblastoma Cellular States | Seurat | Neftel et al. 2019, GSE131928 | ☐ |
-| 04 | Melanoma Immune Landscape | Seurat | Jerby-Arnon et al. 2018, GSE115978 | ☐ |
-| 05 | Colorectal Cancer Single-Cell Atlas | Scanpy | Pelka et al. 2021 / Lee et al. 2020 | ☐ |
-| 06 | RNA Velocity — Pancreatic Endocrinogenesis | scVelo | Bastidas-Ponce et al. 2019 | ☐ |
-| 07 | Trajectory Inference — Hematopoiesis | Palantir + Scanpy | Setty et al. 2019 | ☐ |
-| 08 | Multi-Sample Integration & Batch Correction | Scanpy + Harmony | Re-using #02 or #05 | ☐ |
-| 09 | Cell-Cell Communication Analysis | CellChat (R) | Re-using #02 (TME) | ☐ |
-| 10 | Cross-Platform Re-Analysis & Benchmarking | Scanpy + Seurat | TBD (published set) | ☐ |
+| 01 | PBMC 3K — Reference scRNA-seq Pipeline | Scanpy | 10X PBMC 3K | ✅ |
+| 02 | Breast Cancer Tumor Microenvironment | Scanpy | Wu et al. 2021, GSE176078 | ✅ |
+| 03 | Glioblastoma Cellular States | Seurat | Neftel et al. 2019, GSE131928 | ✅ |
+| 04 | Melanoma Immune Landscape | Seurat | Jerby-Arnon et al. 2018, GSE115978 | ✅ |
+| 05 | Colorectal Cancer Single-Cell Atlas | Scanpy | Pelka et al. 2021 / Lee et al. 2020 | ✅ |
+| 06 | RNA Velocity — Pancreatic Endocrinogenesis | scVelo | Bastidas-Ponce et al. 2019 | ✅ |
+| 07 | Trajectory Inference — Hematopoiesis | Palantir + Scanpy | Setty et al. 2019 | ✅ |
+| 08 | Multi-Sample Integration & Batch Correction | Scanpy + Harmony | Re-using #02 or #05 | ✅ |
+| 09 | Cell-Cell Communication Analysis | CellChat (R) | Re-using #02 (TME) | ✅ |
+| 10 | Cross-Platform Re-Analysis & Benchmarking | Scanpy + Seurat | TBD (published set) | ✅ |
 
 Tick the box (`☐` → `☑`) when each project is fully shipped (figures + notebook + report).
 
