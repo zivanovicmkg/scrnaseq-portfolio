@@ -1,3 +1,7 @@
+> 📊 **Available for scRNA-seq figure consulting** — publication-ready figures with quantitative validation and reproducible code. Seurat or Scanpy.  
+> → [biology2.net/services](https://biology2.net/services)
+
+---
 # scRNA-Seq Portfolio — Marko Živanović
 
 End-to-end single-cell RNA-seq analyses on public datasets, prepared as a portfolio of reproducible workflows across cancer biology, immunology, development, and methodological showcases. Every project ships with: figures, a Jupyter or R notebook, and a short PDF report.
